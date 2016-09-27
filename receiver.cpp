@@ -42,7 +42,7 @@ void receiver::takeResultLine(Packet pdu_pkt) {
                    RawPDU &rawdata = pdu_pkt.pdu()->rfind_pdu<RawPDU>();
                    RawPDU::payload_type &payload = rawdata.payload();
                    string raw_data(payload.begin(), payload.end());
-                   finished[to_string(tcp.ack_seq())] = false;
+                   //finished[to_string(tcp.ack_seq())] = false;
                    // begin chunk
                    cout << "debug 2" << endl;
                    if(detected[to_string(tcp.ack_seq())]) {
@@ -54,10 +54,10 @@ void receiver::takeResultLine(Packet pdu_pkt) {
                                if(find(all_seqs[to_string(tcp.ack_seq())].begin(), all_seqs[to_string(tcp.ack_seq())].end(), tcp.seq()) != all_seqs[to_string(tcp.ack_seq())].end()) {
                                    cout << "Got Duplicate ACK " << endl;
                                }else{
-                                   if(content_length == (tcp.seq() - seqs[to_string(tcp.ack_seq())])){
-                                          finished[to_string(tcp.ack_seq())] = true;
-                                   }
-                                   all_length[ack_str] += receiver::append_to_file(acks[ack_str], raw_data.substr(0, raw_data.size()-1), finished[to_string(tcp.ack_seq())], (tcp.seq() - seqs[to_string(tcp.ack_seq())]));
+//                                   if(content_length == (tcp.seq() - seqs[to_string(tcp.ack_seq())])){
+//                                          finished[to_string(tcp.ack_seq())] = true;
+//                                   }
+                                   all_length[ack_str] += receiver::append_to_file(acks[ack_str], raw_data.substr(0, raw_data.size()-1), false /*finished[to_string(tcp.ack_seq())]*/, (tcp.seq() - seqs[to_string(tcp.ack_seq())]));
                                    all_seqs[to_string(tcp.ack_seq())].push_back(tcp.seq());
                                    cout << "all_length: " << all_length[ack_str] << endl;
                                    cout << "Relative Seq Number is: " << (tcp.seq() - seqs[to_string(tcp.ack_seq())]) << endl;
@@ -72,7 +72,7 @@ void receiver::takeResultLine(Packet pdu_pkt) {
                    //begin chunk 2
                    size_t check_content_type = raw_data.find("Content-Type: application/octet-stream");
                    if(check_content_type != string::npos) {
-                       finished[to_string(tcp.ack_seq())] = false;
+//                       finished[to_string(tcp.ack_seq())] = false;
                        seqs[to_string(tcp.ack_seq())] = tcp.seq();
                        content_length = receiver::get_length(raw_data);
                        cout << "the content length is: " << content_length << endl;
@@ -84,10 +84,10 @@ void receiver::takeResultLine(Packet pdu_pkt) {
                             if(find(all_seqs[to_string(tcp.ack_seq())].begin(), all_seqs[to_string(tcp.ack_seq())].end(), tcp.seq()) != all_seqs[to_string(tcp.ack_seq())].end()) {
                                 cout << "Got Duplicate Ack" << endl;
                             }else{
-                                if(content_length == (tcp.seq() - seqs[to_string(tcp.ack_seq())])){
-                                       finished[to_string(tcp.ack_seq())] = true;
-                                }
-                                all_length[to_string(tcp.ack_seq())] += receiver::append_to_file(acks[ack_str], raw_data.substr(0, raw_data.size()-1), finished[to_string(tcp.ack_seq())], (tcp.seq() - seqs[to_string(tcp.ack_seq())]));
+//                                if(content_length == (tcp.seq() - seqs[to_string(tcp.ack_seq())])){
+//                                       finished[to_string(tcp.ack_seq())] = true;
+//                                }
+                                all_length[to_string(tcp.ack_seq())] += receiver::append_to_file(acks[ack_str], raw_data.substr(0, raw_data.size()-1), false /*finished[to_string(tcp.ack_seq())]*/, (tcp.seq() - seqs[to_string(tcp.ack_seq())]));
                                 all_seqs[to_string(tcp.ack_seq())].push_back(tcp.seq());
                             }
                        }
