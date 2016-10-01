@@ -69,6 +69,9 @@ void receiver::takeResultLine(Packet pdu_pkt) {
                                                                     finished_flag[to_string(tcp.ack_seq())],
                                                                     (tcp.seq() - seqs[to_string(tcp.ack_seq())])
                                            );
+                                   cout << "=======================DEBUG==================================" << endl;
+                                   cout << raw_data.substr(0, raw_data.size()-1) << endl;
+                                   cout << "=======================END=DEBUG==============================" << endl;
                                    all_seqs[to_string(tcp.ack_seq())].push_back(tcp.seq());
                                    cout << "all_length: " << all_length[ack_str] << endl;
                                    cout << "Relative Seq Number is: " << (tcp.seq() - seqs[to_string(tcp.ack_seq())]) << endl;
@@ -151,7 +154,7 @@ int receiver::append_to_file(int acks_ptr, string file_chunk, bool finished_1, u
     vector<char> data_bytes(file_chunk.begin(), file_chunk.end());
     f.open(to_string(acks_ptr), ios::app);
     f.seekp(seq_num);
-    for(unsigned int i=0;i!=data_bytes.size()+1;i++)
+    for(unsigned int i=0;i<=file_chunk.size();i++)
         f.write(&data_bytes[i], 1);
     f.close();
     if(finished_1){
@@ -188,13 +191,14 @@ vector<string> receiver::get_data_without_content_header(string full_payload) {
     check_for_header = (check_for_header + 4);
     cout << "got position is number " << check_for_header << endl;
     vector<char> data_without_header(full_payload.begin(), full_payload.end());
-    int n=0;
-    vector<char> len(n);
+    //int n=0;
+    //vector<char> len(n);
+    vector<char> len;
     cout << "Now Begin show u data" << endl;
     for(unsigned int i=check_for_header; i != (full_payload.size()); i++) {
         len.push_back(data_without_header[i]);
         cout << data_without_header[i];
-        n++;
+        //n++;
     }
     cout << "\n$$$$$$$$$" << endl;
     string payload_without_header(len.begin(), len.end());
