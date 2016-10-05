@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textBrowser->setStyleSheet("background-color: #2a2a2a;");
     th = new StartThread();
     th2 = new receiver();
-    QObject::connect(th, SIGNAL(addResultLine(Packet)), th2, SLOT(takeResultLine(Packet)));
+    QObject::connect(th, SIGNAL(addResultLine(Packet)), th2, SLOT(takeResultLine(Packet)), Qt::QueuedConnection);
     QObject::connect(ui->pushButton, SIGNAL(clicked()), SLOT(start_sniffing()));
     QObject::connect(ui->pushButton_2, SIGNAL(clicked()), SLOT(stop_sniffing()));
 }
