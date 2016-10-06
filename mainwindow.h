@@ -24,7 +24,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     StartThread *th;
-    receiver *th2;
+    Receiver *th2;
 
 private:
     Ui::MainWindow *ui;

@@ -24,16 +24,16 @@ map<string, long> all_length;
 
 long content_length=0;
 
-receiver::receiver(QObject *parent) : QThread(parent)
+Receiver::Receiver(QObject *parent) : QThread(parent)
 {
 //    map<string, bool> finished;
 }
 
-void receiver::run() {
+void Receiver::run() {
     cout << "Running thread 2" << endl;
 }
 
-void receiver::takeResultLine(Packet pdu_pkt) {
+void Receiver::takeResultLine(Packet pdu_pkt) {
     if(pdu_pkt.pdu()->find_pdu<IP>()) {
            if(pdu_pkt.pdu()->find_pdu<TCP>()) {
                if(pdu_pkt.pdu()->find_pdu<RawPDU>()) {
@@ -63,7 +63,7 @@ void receiver::takeResultLine(Packet pdu_pkt) {
                                           finished_flag[to_string(tcp.ack_seq())] = true;
                                    }
                                    all_length[ack_str] +=
-                                           receiver::append_to_file(
+                                           Receiver::append_to_file(
                                                                     acks[ack_str],
                                                                     raw_data.substr(0, raw_data.size()-1),
                                                                     finished_flag[to_string(tcp.ack_seq())],
@@ -93,9 +93,9 @@ void receiver::takeResultLine(Packet pdu_pkt) {
                    if(check_content_type != string::npos) {
                        finished_flag[to_string(tcp.ack_seq())] = false;
                        seqs[to_string(tcp.ack_seq())] = tcp.seq();
-                       content_length = receiver::get_length(raw_data);
+                       content_length = Receiver::get_length(raw_data);
                        vector<string> chunk;
-                       chunk = receiver::get_data_without_content_header(raw_data);
+                       chunk = Receiver::get_data_without_content_header(raw_data);
                        raw_data = chunk[0];
                        int content_h_size = std::stoi(chunk[1]);
                        cout << "Content Header Size is " << content_h_size << endl;
@@ -117,7 +117,7 @@ void receiver::takeResultLine(Packet pdu_pkt) {
                                        finished_flag[to_string(tcp.ack_seq())] = true;
                                 }
                                 all_length[to_string(tcp.ack_seq())] +=
-                                        receiver::append_to_file(
+                                        Receiver::append_to_file(
                                             acks[ack_str],
                                             raw_data.substr(0, raw_data.size()-1),
                                             finished_flag[to_string(tcp.ack_seq())],
@@ -148,7 +148,7 @@ void receiver::takeResultLine(Packet pdu_pkt) {
 
 
 // append chunk too the file
-int receiver::append_to_file(int acks_ptr, string file_chunk, bool finished_1, uint32_t seq_num) {
+int Receiver::append_to_file(int acks_ptr, string file_chunk, bool finished_1, uint32_t seq_num) {
     cout << "the ack number is " << acks_ptr << endl;
     ofstream f;
     vector<char> data_bytes(file_chunk.begin(), file_chunk.end());
@@ -169,7 +169,7 @@ int receiver::append_to_file(int acks_ptr, string file_chunk, bool finished_1, u
 
 
 // get Content-Length
-long receiver::get_length(string payload) {
+long Receiver::get_length(string payload) {
     size_t check_for_length = payload.find("Content-Length: ");
     vector<char> raw_data_vec(payload.begin(), payload.end());
     int n=0;
@@ -184,7 +184,7 @@ long receiver::get_length(string payload) {
 }
 
 
-vector<string> receiver::get_data_without_content_header(string full_payload) {
+vector<string> Receiver::get_data_without_content_header(string full_payload) {
     size_t check_for_header = full_payload.find("\r\n\r\n");
 
     //cout << full_payload << endl;
@@ -209,7 +209,7 @@ vector<string> receiver::get_data_without_content_header(string full_payload) {
 }
 
 //check response
-int receiver::type_of_resp(string data){
+int Receiver::type_of_resp(string data){
     if((data.find("HTTP/1.1 200 OK")) != string::npos)
         return 200;
     else if ((data.find("HTTP/1.1 206 Partial Content")) != string::npos)
